@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Valencia - Gabungan (Bootstrap)</title>
+
+  <!-- Bootstrap CSS (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons (optional) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.4/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Chart.js (CDN) - keep before app.js so app.js can use Chart) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="logo">
+        <div class="vl">VL</div>
+        <div>
+          <div style="font-weight:700">Valencia</div>
+          <div style="font-size:12px;color:var(--muted)">Admin Dashboard</div>
+        </div>
+      </div>
+
+      <nav class="nav-sidebar mt-2" aria-label="Main navigation">
+        <a href="#" class="nav-link active" data-section="overview"><i class="bi bi-speedometer2 me-2"></i>Overview</a>
+        <a href="#" class="nav-link" data-section="reports"><i class="bi bi-file-earmark-text me-2"></i>Reports</a>
+        <a href="#" class="nav-link" data-section="products"><i class="bi bi-box-seam me-2"></i>Products</a>
+        <a href="#" class="nav-link" data-section="customers"><i class="bi bi-people me-2"></i>Customers</a>
+        <a href="#" class="nav-link" data-section="settings"><i class="bi bi-gear me-2"></i>Settings</a>
+      </nav>
+
+      <div class="mt-auto small text-muted">© <span id="yearSidebar"></span> Valencia</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <!-- topbar -->
+      <div class="d-flex justify-content-between align-items-center topbar">
+        <div class="d-flex align-items-center gap-3">
+          <div class="search-box" role="search">
+            <i class="bi bi-search" style="opacity:.6"></i>
+            <input id="globalSearch" class="form-control border-0 p-0" placeholder="Search..." aria-label="Search" />
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-light btn-sm"><i class="bi bi-bell"></i></button>
+          <div class="text-end user-info">
+            <div style="font-size:12px;color:var(--muted)">Welcome back,</div>
+            <div style="font-weight:700" id="displayName">Valencia Lim</div>
+          </div>
+          <div class="avatar">V</div>
+        </div>
+      </div>
+
+      <!-- SECTIONS (only one visible at a time) -->
+      <!-- Overview -->
+      <section id="overview" class="section">
+        <!-- KPI Row -->
+        <div class="row g-3 mb-2">
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="kpi-card">
+              <div class="text-muted small">Total Revenue</div>
+              <div id="kpiRevenue" class="h5 mb-0 fw-bold">$42,430</div>
+              <div id="kpiRevenueSub" class="small text-success">+12% vs last month</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="kpi-card">
+              <div class="text-muted small">New Users</div>
+              <div id="kpiUsers" class="h5 mb-0 fw-bold">1,246</div>
+              <div id="kpiUsersSub" class="small text-danger">-3% vs last month</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="kpi-card">
+              <div class="text-muted small">Active Subscriptions</div>
+              <div id="kpiSubs" class="h5 mb-0 fw-bold">3,402</div>
+              <div id="kpiSubsSub" class="small text-success">+4% vs last month</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="kpi-card">
+              <div class="text-muted small">Churn Rate</div>
+              <div id="kpiChurn" class="h5 mb-0 fw-bold">2.1%</div>
+              <div id="kpiChurnSub" class="small text-success">Improved</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- charts -->
+        <div class="row g-3 mb-2">
+          <div class="col-12 col-lg-8">
+            <div class="card-chart" style="height:260px">
+              <div class="d-flex justify-content-between mb-2">
+                <div>
+                  <div class="fw-bold">Monthly Performance</div>
+                  <div class="small text-muted">Last 12 months</div>
+                </div>
+                <div class="small text-muted">Export · Filters</div>
+              </div>
+              <canvas id="areaChart" style="height:200px; width:100%"></canvas>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-4">
+            <div class="card-chart d-flex flex-column align-items-center justify-content-center" style="height:260px">
+              <div class="text-center mb-2">
+                <div class="fw-bold">Traffic Sources</div>
+                <div class="small text-muted">Last 30 days</div>
+              </div>
+              <div style="width:180px;height:140px">
+                <canvas id="pieChart" width="180" height="140"></canvas>
+              </div>
+              <div class="w-100 mt-3 small text-muted">
+                <div class="d-flex justify-content-between"><div><i class="bi bi-square-fill" style="color:var(--accent-1)"></i> Direct</div><strong id="pctDirect">40%</strong></div>
+                <div class="d-flex justify-content-between"><div><i class="bi bi-square-fill" style="color:var(--accent-3)"></i> Social</div><strong id="pctSocial">30%</strong></div>
+                <div class="d-flex justify-content-between"><div><i class="bi bi-square-fill" style="color:var(--accent-2)"></i> Referral</div><strong id="pctReferral">30%</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- bottom: bar + table -->
+        <div class="row g-3">
+          <div class="col-12 col-lg-6">
+            <div class="card-chart" style="height:320px">
+              <div class="fw-bold mb-2">Top Products</div>
+              <canvas id="barChart" style="height:260px; width:100%"></canvas>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <div class="table-card" style="height:320px; overflow:auto">
+              <div class="fw-bold mb-2">Recent Customers</div>
+              <div class="table-responsive">
+                <table id="customersTable" class="table align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width:60px">#</th>
+                      <th>Name</th>
+                      <th>Status</th>
+                      <th class="text-end">Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- filled by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reports section -->
+      <section id="reports" class="section d-none">
+        <div class="card-chart" style="height:520px">
+          <div class="d-flex justify-content-between mb-2">
+            <div>
+              <div class="fw-bold">Reports</div>
+              <div class="small text-muted">Detail analytics & export</div>
+            </div>
+            <div>
+              <button id="exportCSV" class="btn btn-outline-primary btn-sm"><i class="bi bi-download"></i> Export CSV</button>
+            </div>
+          </div>
+          <div style="height:460px">
+            <canvas id="reportsArea" style="height:100%; width:100%"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products section -->
+      <section id="products" class="section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <div class="fw-bold">Products</div>
+            <div class="small text-muted">List of products and quick actions</div>
+          </div>
+          <div>
+            <button id="addProductBtn" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Add Product</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-responsive">
+            <table id="productsTable" class="table">
+              <thead>
+                <tr>
+                  <th style="width:60px">#</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th class="text-end">Sales</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Customers section -->
+      <section id="customers" class="section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <div class="fw-bold">Customers</div>
+            <div class="small text-muted">Manage and search customers</div>
+          </div>
+          <div>
+            <input id="customerSearch" type="search" class="form-control form-control-sm" placeholder="Search customer..." style="width:220px">
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-responsive">
+            <table id="customersTable2" class="table">
+              <thead>
+                <tr>
+                  <th style="width:60px">#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th class="text-end">Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings section -->
+      <section id="settings" class="section d-none">
+        <div class="card-chart" style="padding:18px;">
+          <div class="fw-bold mb-2">Settings</div>
+          <form id="settingsForm" class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Display name</label>
+              <input id="setName" class="form-control" value="Valencia Lim">
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Email</label>
+              <input id="setEmail" type="email" class="form-control" value="valencia@example.com">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Theme</label>
+              <select id="setTheme" class="form-select" style="max-width:220px;">
+                <option value="light">Light</option>
+                <option value="dark">Dark (not implemented)</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary" type="submit">Save settings</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <footer>© <span id="yearMain"></span> Valencia · Sample dashboard</footer>
+    </main>
+  </div>
+
+  <!-- Bootstrap JS bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- App JS -->
+  <script src="app.js"></script>
+</body>
+</html>
